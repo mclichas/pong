@@ -57,21 +57,27 @@ BALL_SERVE_DELAY = 60  # frames to wait before serving
 class Ball:
     """The pong ball."""
 
+    dx: float
+    dy: float
+    current_speed: float
+
     def __init__(self) -> None:
         self.rect = pygame.Rect(0, 0, BALL_SIZE, BALL_SIZE)
+        self.dx = 0.0
+        self.dy = 0.0
+        self.current_speed = float(BALL_SPEED_INITIAL)
         self.reset()
-        self.current_speed = BALL_SPEED_INITIAL
 
     def reset(self) -> None:
         self.rect.center = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
-        self.dx = 0
-        self.dy = 0
-        self.current_speed = BALL_SPEED_INITIAL
+        self.dx = 0.0
+        self.dy = 0.0
+        self.current_speed = float(BALL_SPEED_INITIAL)
         self.wait_timer = BALL_SERVE_DELAY
 
     def serve(self) -> None:
-        self.dx = BALL_SPEED_INITIAL * (-1 if pygame.time.get_ticks() % 2 == 0 else 1)
-        self.dy = BALL_SPEED_INITIAL * (-1 if pygame.time.get_ticks() % 3 == 0 else 1)
+        self.dx = float(BALL_SPEED_INITIAL * (-1 if pygame.time.get_ticks() % 2 == 0 else 1))
+        self.dy = float(BALL_SPEED_INITIAL * (-1 if pygame.time.get_ticks() % 3 == 0 else 1))
 
     def move(self) -> None:
         if self.wait_timer > 0:
@@ -134,6 +140,11 @@ class PongGame:
         self.game_over = False
         self.winner = ""
         self.show_menu = True
+        self.left_paddle = Paddle(PADDLE_MARGIN, SCREEN_HEIGHT // 2 - PADDLE_HEIGHT // 2)
+        self.right_paddle = Paddle(SCREEN_WIDTH - PADDLE_MARGIN - PADDLE_WIDTH, SCREEN_HEIGHT // 2 - PADDLE_HEIGHT // 2)
+        self.ball = Ball()
+        if self.ai_mode:
+            self.ai = AI(self.right_paddle, difficulty=0.6)
 
     def reset_game(self) -> None:
         self.left_paddle = Paddle(PADDLE_MARGIN, SCREEN_HEIGHT // 2 - PADDLE_HEIGHT // 2)
@@ -250,7 +261,9 @@ class PongGame:
         # Game over
         if self.game_over:
             win_text = self.font.render(f"{self.winner} wins! Press R to restart", True, WHITE)
-            self.screen.blit(win_text, (SCREEN_WIDTH // 2 - win_text.get_width() // 2, SCREEN_HEIGHT // 2 - win_text.get_height() // 2))
+            text_x = SCREEN_WIDTH // 2 - win_text.get_width() // 2
+            text_y = SCREEN_HEIGHT // 2 - win_text.get_height() // 2
+            self.screen.blit(win_text, (text_x, text_y))
 
         pygame.display.flip()
 

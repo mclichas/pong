@@ -2,13 +2,13 @@
 
 import os
 
-os.environ["SDL_VIDEODRIVER"] = "dummy"
-
 import pygame
+
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 pygame.init()
 
-from src.pong.game import WINNING_SCORE, Ball, Paddle, PongGame
+from src.pong.game import WINNING_SCORE, Ball, Paddle, PongGame  # noqa: E402
 
 
 def test_paddle_stays_in_bounds() -> None:
@@ -40,6 +40,7 @@ def test_ball_bounces_off_walls() -> None:
 
 def test_game_score_starts_at_zero() -> None:
     game = PongGame()
+    game.show_menu = False
     assert game.left_paddle.score == 0
     assert game.right_paddle.score == 0
     assert game.game_over is False
@@ -47,8 +48,10 @@ def test_game_score_starts_at_zero() -> None:
 
 def test_winning_score() -> None:
     game = PongGame()
+    game.show_menu = False
+    game.ball.wait_timer = 0
     game.left_paddle.score = WINNING_SCORE - 1
-    game.ball.rect.left = 0
+    game.ball.rect.right = 800  # SCREEN_WIDTH
     game.update()
     assert game.left_paddle.score == WINNING_SCORE
     assert game.game_over is True
